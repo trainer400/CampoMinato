@@ -1,4 +1,4 @@
-package game.campo.main;
+package game.minesweeper.main;
 
 public class Main 
 {
