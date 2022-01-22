@@ -23,6 +23,15 @@ public class MouseListener extends GLFWMouseButtonCallback
 	 */
 	private MousePositionListener positionListener;
 	
+	/**
+	 * Constructor
+	 */
+	public MouseListener()
+	{
+		//Initialize the position listener
+		positionListener = new MousePositionListener();
+	}
+	
 	@Override
 	public synchronized void invoke(long window, int button, int action, int mods) 
 	{
