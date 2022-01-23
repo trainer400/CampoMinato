@@ -8,7 +8,7 @@ public class MouseEvent
 {	
 	public static enum MouseEventType
 	{
-		RIGHT_CLICK, LEFT_CLICK, CENTER_CLICK
+		LEFT_CLICK, RIGHT_CLICK, CENTER_CLICK
 	}
 	
 	/**
