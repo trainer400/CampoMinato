@@ -21,8 +21,10 @@ import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-import org.lwjgl.glfw.GLFWWindowSizeCallback;
+import java.util.ArrayList;
+import java.util.List;
 
+import game.minesweeper.render.VAO;
 import game.minesweeper.window.listener.MouseEvent;
 import game.minesweeper.window.listener.MouseListener;
 
@@ -30,7 +32,7 @@ import game.minesweeper.window.listener.MouseListener;
  * This singleton class represents the main window for the game
  * @author Matteo Pignataro
  */
-public class Window extends GLFWWindowSizeCallback
+public class Window
 {
 	/**
 	 * OpenGL window ID
@@ -68,6 +70,11 @@ public class Window extends GLFWWindowSizeCallback
 	private MouseListener mouseListener;
 	
 	/**
+	 * VAOs list
+	 */
+	private List<VAO> vaoList;
+	
+	/**
 	 * Private Constructor
 	 */
 	public Window(String name, int width, int height, boolean resizable)
@@ -84,6 +91,9 @@ public class Window extends GLFWWindowSizeCallback
 		
 		//Initialize the mouse listener
 		mouseListener = new MouseListener();
+		
+		//Initialize the VAO list
+		vaoList = new ArrayList<VAO>();
 		
 		//Initialize the window
 		initWindow();
@@ -122,7 +132,7 @@ public class Window extends GLFWWindowSizeCallback
 			//Set the callback to call the clean function
 			glfwSetWindowCloseCallback(ID, (long window) -> clean());
 			//Set this object as window size change listener
-			glfwSetWindowSizeCallback(ID, this);
+			glfwSetWindowSizeCallback(ID, (long window, int w, int h) -> updateSize(w, h));
 		}
 	}
 	
@@ -149,6 +159,21 @@ public class Window extends GLFWWindowSizeCallback
 	}
 	
 	/**
+	 * Callback method on updated window size
+	 * @param width The new width
+	 * @param height The new height
+	 */
+	public void updateSize(int width, int height)
+	{
+		//Change the values
+		this.width = width;
+		this.height = height;
+		
+		//Update all the VAOs objects
+		vaoList.stream().forEach((VAO v) -> v.updateWindowSize(width, height));
+	}
+	
+	/**
 	 * Clears all the callbacks and the window itself
 	 */
 	public void clean()
@@ -162,13 +187,27 @@ public class Window extends GLFWWindowSizeCallback
 		//Put the status to closed
 		open = false;
 	}
-
-	@Override
-	public void invoke(long window, int width, int height) 
+	
+	/**
+	 * Add the vao to the VAOs list
+	 * @param v The VAO that needs to be added
+	 */
+	public void addVAO(VAO v)
 	{
-		//Update the Width and height values
-		this.width = width;
-		this.height = height;
+		//I add it if its not already present
+		if(!vaoList.contains(v))
+		{
+			vaoList.add(v);
+		}
+	}
+	
+	/**
+	 * Method to draw all the VAOs
+	 */
+	public void drawVAO()
+	{
+		//For each VAO i call the draw method
+		vaoList.stream().forEach((VAO v) -> v.draw());
 	}
 	
 	/**

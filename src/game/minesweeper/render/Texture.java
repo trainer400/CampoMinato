@@ -136,6 +136,8 @@ public class Texture
 		if(textureID != 0)
 		{
 			glDeleteTextures(textureID);
+			//Turn the textureID to 0
+			textureID = 0;
 		}
 	}
 	

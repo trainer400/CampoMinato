@@ -15,7 +15,7 @@ public class MousePositionListener extends GLFWCursorPosCallback
 	private double posY;
 	
 	@Override
-	public synchronized void invoke(long window, double xpos, double ypos) 
+	public void invoke(long window, double xpos, double ypos) 
 	{
 		//Set the new position
 		this.posX = xpos;
@@ -25,6 +25,6 @@ public class MousePositionListener extends GLFWCursorPosCallback
 	/**
 	 * Mouse position getters
 	 */
-	public synchronized double getPosX() { return posX; }
-	public synchronized double getPosY() { return posY; }
+	public double getPosX() { return posX; }
+	public double getPosY() { return posY; }
 }

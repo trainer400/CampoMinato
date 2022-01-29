@@ -33,7 +33,7 @@ public class MouseListener extends GLFWMouseButtonCallback
 	}
 	
 	@Override
-	public synchronized void invoke(long window, int button, int action, int mods) 
+	public void invoke(long window, int button, int action, int mods) 
 	{
 		//Check if the user pressed the button
 		if(action == GLFW_PRESS)
@@ -48,7 +48,7 @@ public class MouseListener extends GLFWMouseButtonCallback
 	/**
 	 * @return Last mouse event. Null value in case of no recent event.
 	 */
-	public synchronized MouseEvent getLastMouseEvent() 
+	public MouseEvent getLastMouseEvent() 
 	{
 		//Check if there is something to return
 		if(lastMouseEvent == null) { return null; }

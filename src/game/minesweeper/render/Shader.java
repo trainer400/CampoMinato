@@ -198,6 +198,8 @@ public class Shader
 		if(programID != 0)
 		{
 			glDeleteProgram(programID);
+			//Turn the programID to 0
+			programID = 0;
 		}
 	}
 }
