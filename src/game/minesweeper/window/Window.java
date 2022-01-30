@@ -19,6 +19,7 @@ import static org.lwjgl.glfw.GLFW.glfwShowWindow;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
+import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 import java.util.ArrayList;
@@ -80,10 +81,10 @@ public class Window
 	public Window(String name, int width, int height, boolean resizable)
 	{
 		//Initial dimensions
-		this.name = name == null ? "" : name;
-		this.width = 500;
-		this.height = 500;
-		this.resizable = resizable;
+		this.name 		= name == null 	? "" 		: name;
+		this.width 		= width > 0 	? width 	: 500;
+		this.height 	= height > 0 	? height 	: 500;
+		this.resizable 	= resizable;
 		//Set the window to not initialized
 		this.ID = -1;
 		//Set the window to open
@@ -171,6 +172,9 @@ public class Window
 		
 		//Update all the VAOs objects
 		vaoList.stream().forEach((VAO v) -> v.updateWindowSize(width, height));
+		
+		//Reset openGL references
+		glViewport(0, 0, width, height);
 	}
 	
 	/**
@@ -178,6 +182,9 @@ public class Window
 	 */
 	public void clean()
 	{
+		//Clean all the VAOs
+		vaoList.stream().forEach((VAO v) -> v.clean());
+		
 		//Release callbacks
 		glfwFreeCallbacks(ID);
 		
@@ -197,7 +204,10 @@ public class Window
 		//I add it if its not already present
 		if(!vaoList.contains(v))
 		{
+			//Add the VAO to the list
 			vaoList.add(v);
+			//Send a change dimensions to force every element to adapt
+			v.updateWindowSize(width, height);
 		}
 	}
 	

@@ -14,7 +14,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
-import static org.lwjgl.opengl.GL45.glTextureParameteri;
+import static org.lwjgl.opengl.GL11.glTexParameteri;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 
@@ -58,6 +58,10 @@ public class Texture
 		{
 			createTexture(path);
 		}
+		else 
+		{
+			throw new RuntimeException("No texture file detected [Texture]");
+		}
 	}
 	
 	/**
@@ -71,11 +75,11 @@ public class Texture
 		bind();
 		
 		//Set the texture parameters
-		glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); //Repeat in case of >1 coordinates
-		glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); //Same on the y axis
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); //Repeat in case of >1 coordinates
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); //Same on the y axis
 		
-		glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); //Select the nearest pixel
-		glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); //The same in expansion
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); //Select the nearest pixel
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); //The same in expansion
 		
 		//Create the buffer and read the image
 		IntBuffer widthBuffer = BufferUtils.createIntBuffer(1);
