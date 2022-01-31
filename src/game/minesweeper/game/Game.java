@@ -26,9 +26,57 @@ import game.minesweeper.window.Window;
 public class Game
 {
 	/**
+	 * Game properties
+	 */
+	private static final int widthCell 	= 20;
+	private static final int heightCell = 20;
+	private static final int sizeCell 	= 30;
+	
+	/**
 	 * Main window
 	 */
 	private static Window window;
+	
+	/**
+	 * Cell table variables
+	 */
+	private static CellTable table;
+	
+	
+	/**
+	 * Method to initialize all that is needed for the cell table
+	 */
+	private static void initCells()
+	{
+		//Create texture and shader for cells
+		Shader cellShader = new Shader("Shaders/buttonVertex.glsl", "Shaders/buttonFragment.glsl", null);
+		Texture cellTexture = new Texture("Textures/ButtonTexture.png");
+				
+		//Create the VAO for cells
+		VAO cellVAO = new VAO(cellShader, cellTexture);
+		
+		//Create the cellTable
+		table = new CellTable(0, 0, widthCell, heightCell, sizeCell);
+		
+		//Create a temporary copy of the table
+		Cell[][] temp = table.getTable();
+		
+		//Add all the cells to the VAO
+		for(int i = 0; i < temp.length; i++)
+		{
+			for(int j = 0; j < temp[i].length; j++)
+			{
+				cellVAO.addElement(temp[i][j]);
+			}
+		}
+		
+		//Add the cell attributes
+		cellVAO.addAttribute(2);
+		cellVAO.addAttribute(2);
+		
+		//At the end add the VAO to the window
+		window.addVAO(cellVAO);
+	}
 	
 	/**
 	 * Initializes all the class objects and sets them
@@ -43,29 +91,13 @@ public class Game
 		}
 		
 		//Create the window object
-		window = new Window("Mine Sweeper", 500, 500, true);
+		window = new Window("Mine Sweeper", widthCell * sizeCell, heightCell * sizeCell, false);
 		
 		//Create all OpenGL bindings
 		GL.createCapabilities();
 		
-		//Create all the VAOs
-		Shader buttonShader = new Shader("Shaders/buttonVertex.glsl", "Shaders/buttonFragment.glsl", null);
-		Texture buttonTexture = new Texture("Textures/ButtonTexture.png");
-				
-		VAO buttonVAO = new VAO(buttonShader, buttonTexture);
-				
-		//Create all the game objects
-		Button button = new Button(0, 0, 500, 500);
-				
-		//Add all the elements to the VAOs
-		buttonVAO.addElement(button);
-			
-		//Add all the attributes to the VAOs
-		buttonVAO.addAttribute(2);
-		buttonVAO.addAttribute(2);
-				
-		//Add the VAO to the window
-		window.addVAO(buttonVAO);
+		//Init the cells
+		initCells();
 		
 		//Visualize the window
 		window.showWindow();
@@ -96,6 +128,9 @@ public class Game
 		//While the game is running
 		while(window.isOpen())
 		{	
+			//Call the handleMouseEvent functions
+			table.handleMouseEvent(window.getLastMouseEvent());
+			
 			//Draw the VAOs
 			window.drawVAO();
 			
