@@ -157,7 +157,19 @@ public class Cell extends DrawableElement
 	 * Method to change the cell internal state
 	 * @param state That needs to be set
 	 */
-	public void setState(CellStates state) { this.state = state; updated = true; }
+	public void setState(CellStates state) 		{ this.state = state; updated = true; }
+	
+	/**
+	 * Current state getter
+	 * @return the current state
+	 */
+	public CellStates getState() { return state; }
+	
+	/**
+	 * Method to change the real cell state
+	 * @param state That needs to be set
+	 */
+	public void setRealState(CellStates state) 	{ this.realState = state; }
 	
 	/**
 	 * @return the real cell state hidden
