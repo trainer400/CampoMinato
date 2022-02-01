@@ -55,12 +55,12 @@ public class CellTable
 				//Percentage of bombs
 				if(Math.random() > 0.9)
 				{
-					table[i][j] = new Cell(x + i * cellSize, y + j * cellSize, cellSize, cellSize, CellStates.BOMB);
+					table[i][j] = new Cell(x + i * cellSize, y + j * cellSize, cellSize, cellSize, CellState.BOMB);
 				}
 				else 
 				{
 					//Otherwise it is a void cell for now
-					table[i][j] = new Cell(x + i * cellSize, y + j * cellSize, cellSize, cellSize, CellStates.CELL_NONE);
+					table[i][j] = new Cell(x + i * cellSize, y + j * cellSize, cellSize, cellSize, CellState.CELL_NONE);
 				}
 			}
 		}
@@ -81,32 +81,32 @@ public class CellTable
 			for(int j = 0; j < table[0].length; j++)
 			{
 				//If this cell is not a bomb
-				if(table[i][j].getRealState() != CellStates.BOMB)
+				if(table[i][j].getRealState() != CellState.BOMB)
 				{
 					//Count how many bombs are near this cell
 					int count = 0;
 					
 					//Top left cell
-					if(i - 1 >= 0 && j - 1 >= 0 && table[i - 1][j - 1].getRealState() == CellStates.BOMB) count++;
+					if(i - 1 >= 0 && j - 1 >= 0 && table[i - 1][j - 1].getRealState() == CellState.BOMB) count++;
 					//Middle left cell
-					if(i - 1 >= 0 && table[i - 1][j].getRealState() == CellStates.BOMB) count++;
+					if(i - 1 >= 0 && table[i - 1][j].getRealState() == CellState.BOMB) count++;
 					//Bottom left cell
-					if(i - 1 >= 0 && j + 1 < table[0].length && table[i - 1][j + 1].getRealState() == CellStates.BOMB) count++;
+					if(i - 1 >= 0 && j + 1 < table[0].length && table[i - 1][j + 1].getRealState() == CellState.BOMB) count++;
 					//Top middle cell
-					if(j - 1 >= 0 && table[i][j - 1].getRealState() == CellStates.BOMB) count++;
+					if(j - 1 >= 0 && table[i][j - 1].getRealState() == CellState.BOMB) count++;
 					//Top right cell
-					if(i + 1 < table.length && j - 1 >= 0 && table[i + 1][j - 1].getRealState() == CellStates.BOMB) count++;
+					if(i + 1 < table.length && j - 1 >= 0 && table[i + 1][j - 1].getRealState() == CellState.BOMB) count++;
 					//Middle right cell
-					if(i + 1 < table.length && table[i + 1][j].getRealState() == CellStates.BOMB) count++;
+					if(i + 1 < table.length && table[i + 1][j].getRealState() == CellState.BOMB) count++;
 					//Bottom right cell
-					if(i + 1 < table.length && j + 1 < table[0].length && table[i + 1][j + 1].getRealState() == CellStates.BOMB) count++;
+					if(i + 1 < table.length && j + 1 < table[0].length && table[i + 1][j + 1].getRealState() == CellState.BOMB) count++;
 					//Bottom middle cell
-					if(j + 1 < table[0].length && table[i][j + 1].getRealState() == CellStates.BOMB) count++;
+					if(j + 1 < table[0].length && table[i][j + 1].getRealState() == CellState.BOMB) count++;
 					
 					//Only if the count differs from 0 i change the texture
 					if(count > 0)
 					{
-						table[i][j].setRealState(CellStates.values()[1 + count]);
+						table[i][j].setRealState(CellState.values()[1 + count]);
 					}
 				}
 			}
@@ -126,14 +126,14 @@ public class CellTable
 				//Percentage of bombs
 				if(Math.random() > 0.9)
 				{
-					table[i][j].setRealState(CellStates.BOMB);
-					table[i][j].setState(CellStates.CELL_HIDDEN);
+					table[i][j].setRealState(CellState.BOMB);
+					table[i][j].setState(CellState.CELL_HIDDEN);
 				}
 				else 
 				{
 					//Otherwise it is a void cell for now
-					table[i][j].setRealState(CellStates.CELL_NONE);
-					table[i][j].setState(CellStates.CELL_HIDDEN);
+					table[i][j].setRealState(CellState.CELL_NONE);
+					table[i][j].setState(CellState.CELL_HIDDEN);
 				}
 			}
 		}
@@ -159,22 +159,22 @@ public class CellTable
 			for(int j = 0; j < table[0].length; j++)
 			{
 				//Check if the mouse position is inside the cell and if the cell has not already been discovered
-				if(table[i][j].isInside((int)event.getPosX(), (int)event.getPosY()) && (table[i][j].getState() == CellStates.CELL_HIDDEN
-																						|| table[i][j].getState() == CellStates.FLAG))
+				if(table[i][j].isInside((int)event.getPosX(), (int)event.getPosY()) && (table[i][j].getState() == CellState.CELL_HIDDEN
+																						|| table[i][j].getState() == CellState.FLAG))
 				{
 					//I check if it is a center/right clic
 					if(event.getEventType() != MouseEventType.LEFT_CLICK)
 					{
 						//I place or remove the flag
-						if(table[i][j].getState() == CellStates.FLAG)
+						if(table[i][j].getState() == CellState.FLAG)
 						{
 							//If it is a flag i remove it
-							table[i][j].setState(CellStates.CELL_HIDDEN);
+							table[i][j].setState(CellState.CELL_HIDDEN);
 						}
 						else
 						{
 							//I put a flag
-							table[i][j].setState(CellStates.FLAG);
+							table[i][j].setState(CellState.FLAG);
 						}
 						//Then i terminate
 						return;
@@ -182,7 +182,7 @@ public class CellTable
 					
 					//If this is a blank cell i swap the state with the real state and i call an event for all
 					//the nearest cells. It needs to not be a flag
-					if(table[i][j].getRealState() == CellStates.CELL_NONE && table[i][j].getState() != CellStates.FLAG)
+					if(table[i][j].getRealState() == CellState.CELL_NONE && table[i][j].getState() != CellState.FLAG)
 					{
 						//Swap the states
 						table[i][j].setState(table[i][j].getRealState());
@@ -228,13 +228,13 @@ public class CellTable
 														event.getPosY(),
 														MouseEventType.LEFT_CLICK));
 					}
-					else if(table[i][j].getState() != CellStates.FLAG)
+					else if(table[i][j].getState() != CellState.FLAG)
 					{
 						//If i discover a bomb
-						if(table[i][j].getRealState() == CellStates.BOMB)
+						if(table[i][j].getRealState() == CellState.BOMB)
 						{
 							//Set the state to red bomb
-							table[i][j].setState(CellStates.BOMB_RED);
+							table[i][j].setState(CellState.BOMB_RED);
 							
 							//TODO Game ends
 							
@@ -245,6 +245,79 @@ public class CellTable
 							table[i][j].setState(table[i][j].getRealState());
 						}
 					}
+				}
+				else if(table[i][j].isInside((int)event.getPosX(), (int)event.getPosY()) && table[i][j].getRealState() != CellState.BOMB &&
+																							table[i][j].getRealState() != CellState.CELL_NONE)
+				{
+					//If the cell has already been discovered and is not a bomb
+					//If the flags near it are the same number or above the real state i can discover all
+					//the near hidden cells
+					//Count how many flags are near this cell
+					int count = 0;
+					
+					//Top left cell
+					if(i - 1 >= 0 && j - 1 >= 0 && table[i - 1][j - 1].getState() == CellState.FLAG) count++;
+					//Middle left cell
+					if(i - 1 >= 0 && table[i - 1][j].getState() == CellState.FLAG) count++;
+					//Bottom left cell
+					if(i - 1 >= 0 && j + 1 < table[0].length && table[i - 1][j + 1].getState() == CellState.FLAG) count++;
+					//Top middle cell
+					if(j - 1 >= 0 && table[i][j - 1].getState() == CellState.FLAG) count++;
+					//Top right cell
+					if(i + 1 < table.length && j - 1 >= 0 && table[i + 1][j - 1].getState() == CellState.FLAG) count++;
+					//Middle right cell
+					if(i + 1 < table.length && table[i + 1][j].getState() == CellState.FLAG) count++;
+					//Bottom right cell
+					if(i + 1 < table.length && j + 1 < table[0].length && table[i + 1][j + 1].getState() == CellState.FLAG) count++;
+					//Bottom middle cell
+					if(j + 1 < table[0].length && table[i][j + 1].getState() == CellState.FLAG) count++;
+					
+					//If the counted flags are more than the reported number i discover all the near ones
+					if(count < table[i][j].getState().NUMBER)
+					{
+						return;
+					}
+					
+					//Top left cell
+					if(i - 1 >= 0 && j - 1 >= 0 && table[i - 1][j - 1].getState() == CellState.CELL_HIDDEN)
+						handleMouseEvent(new MouseEvent(event.getPosX() - cellSize, 
+														event.getPosY() - cellSize,
+														MouseEventType.LEFT_CLICK));
+					//Middle left cell
+					if(i - 1 >= 0 && table[i - 1][j].getState() == CellState.CELL_HIDDEN)
+						handleMouseEvent(new MouseEvent(event.getPosX() - cellSize, 
+														event.getPosY(),
+														MouseEventType.LEFT_CLICK));
+					//Bottom left cell
+					if(i - 1 >= 0 && j + 1 < table[0].length && table[i - 1][j + 1].getState() == CellState.CELL_HIDDEN)
+						handleMouseEvent(new MouseEvent(event.getPosX() - cellSize, 
+														event.getPosY() + cellSize,
+														MouseEventType.LEFT_CLICK));
+					//Top middle cell
+					if(j - 1 >= 0 && table[i][j - 1].getState() == CellState.CELL_HIDDEN)
+						handleMouseEvent(new MouseEvent(event.getPosX(), 
+														event.getPosY() - cellSize,
+														MouseEventType.LEFT_CLICK));
+					//Top right cell
+					if(i + 1 < table.length && j - 1 >= 0 && table[i + 1][j - 1].getState() == CellState.CELL_HIDDEN)
+						handleMouseEvent(new MouseEvent(event.getPosX() + cellSize, 
+														event.getPosY() - cellSize,
+														MouseEventType.LEFT_CLICK));
+					//Middle right cell
+					if(i + 1 < table.length && table[i + 1][j].getState() == CellState.CELL_HIDDEN)
+						handleMouseEvent(new MouseEvent(event.getPosX() + cellSize, 
+														event.getPosY(),
+														MouseEventType.LEFT_CLICK));
+					//Bottom right cell
+					if(i + 1 < table.length && j + 1 < table[0].length && table[i + 1][j + 1].getState() == CellState.CELL_HIDDEN)
+						handleMouseEvent(new MouseEvent(event.getPosX() + cellSize, 
+														event.getPosY() + cellSize,
+														MouseEventType.LEFT_CLICK));
+					//Bottom middle cell
+					if(j + 1 < table[0].length && table[i][j + 1].getState() == CellState.CELL_HIDDEN)
+						handleMouseEvent(new MouseEvent(event.getPosX(), 
+														event.getPosY() + cellSize,
+														MouseEventType.LEFT_CLICK));
 				}
 			}
 		}

@@ -3,19 +3,18 @@ package game.minesweeper.game.objects;
 import game.minesweeper.render.DrawableElement;
 
 /**
- * This class represents a typical minesweeper cell with sizeX, sizeY
- * And position related to the top left corner of the window
+ * Drawable element that represent a single digit number
  * @author Matteo Pignataro
  */
-public class Cell extends DrawableElement
+public class NumberDisplay extends DrawableElement
 {
 	/**
-	 * X position
+	 * Top left corner X position
 	 */
 	private int x;
 	
 	/**
-	 * Y position
+	 * Top left corner Y position
 	 */
 	private int y;
 	
@@ -30,17 +29,12 @@ public class Cell extends DrawableElement
 	private int dimY;
 	
 	/**
-	 * The game cell actual state
+	 * Number visualized
 	 */
-	private CellState state;
+	private NumberDisplayState state;
 	
 	/**
-	 * The undercover state
-	 */
-	private CellState realState;
-	
-	/**
-	 * Vertices array
+	 * Vertex array
 	 */
 	private float vertices[];
 	
@@ -51,12 +45,12 @@ public class Cell extends DrawableElement
 	
 	/**
 	 * Constructor
-	 * @param x the top left corner
-	 * @param y the top left corner
-	 * @param dimX the button X dimension
-	 * @param dimY the button Y dimension
+	 * @param x The top left x coordinate
+	 * @param y The top left y coordinate
+	 * @param dimX The X dimensions
+	 * @param dimY The Y dimensions
 	 */
-	public Cell(int x, int y, int dimX, int dimY, CellState realState)
+	public NumberDisplay(int x, int y, int dimX, int dimY)
 	{
 		//Assign all the variables
 		this.x = x;
@@ -65,19 +59,16 @@ public class Cell extends DrawableElement
 		this.dimX = dimX > 0 ? dimX : 1;
 		this.dimY = dimY > 0 ? dimY : 1;
 		
-		//I set the real state
-		this.realState = realState;
-		
-		//By default i set the cell to be hidden
-		state = CellState.CELL_HIDDEN;
+		//By default i set the state to 0
+		state = NumberDisplayState.NUMBER_0;
 		
 		//Instance the arrays
-		vertices = new float[16]; //4 floats per vertex (2 for x and y) (2 for texture mapping)
+		vertices = new float[16]; //4 vertices with 4 values
 		elements = new int[]{0, 1, 3, 0, 3, 2}; //sequence for rectangle draw
 	}
 	
 	/**
-	 * Method to transfer the cell state texture mapping to the vertices array
+	 * Method to setup the texure mappings
 	 */
 	private void setupTexture()
 	{
@@ -132,50 +123,53 @@ public class Cell extends DrawableElement
 	}
 	
 	/**
-	 * Method that checks if the position passed is inside the cell
-	 * @param posX The X position to analyze
-	 * @param posY The Y position to analyze
-	 * @return boolean of the result
+	 * Method to increment the number visualized.
+	 * In case of state 9 the next value is 0
 	 */
-	public boolean isInside(int posX, int posY)
+	public void increment()
 	{
-		//If the X position is inside
-		if(posX > x && posX < x + dimX)
+		if(state.NUMBER < 9)
 		{
-			//If the Y position is inside
-			if(posY > y && posY < y + dimY)
-			{
-				//It is inside the cell
-				return true;
-			}
+			//Set the number to its successor
+			state = NumberDisplayState.values()[state.NUMBER + 1];
 		}
-		//It's not inside the cell
-		return false;
+		else 
+		{
+			state = NumberDisplayState.NUMBER_0;
+		}
+		//Force the update
+		updated = true;
 	}
 	
 	/**
-	 * Method to change the cell internal state
-	 * @param state That needs to be set
+	 * Reset method. Initial state is 0
 	 */
-	public void setState(CellState state) 		{ this.state = state; updated = true; }
+	public void reset()
+	{
+		//Set the number to 0
+		state = NumberDisplayState.NUMBER_0;
+		//Force the update
+		updated = true;
+	}
 	
 	/**
-	 * Current state getter
-	 * @return the current state
+	 * Method to set manually the number visualized
+	 * @param state The state number
 	 */
-	public CellState getState() { return state; }
+	public void setState(NumberDisplayState state)
+	{
+		//Set the state
+		this.state = state;
+		//Force update
+		updated = true;
+	}
 	
 	/**
-	 * Method to change the real cell state
-	 * @param state That needs to be set
+	 * State getter
+	 * @return The current state
 	 */
-	public void setRealState(CellState state) 	{ this.realState = state; }
+	public NumberDisplayState getState() { return state; }
 	
-	/**
-	 * @return the real cell state hidden
-	 */
-	public CellState getRealState() { return realState; }
-
 	@Override
 	public float[] getVertices() 
 	{	

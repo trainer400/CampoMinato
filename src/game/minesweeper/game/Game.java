@@ -16,7 +16,8 @@ import org.lwjgl.opengl.GL;
 
 import game.minesweeper.game.objects.Cell;
 import game.minesweeper.game.objects.CellTable;
-import game.minesweeper.game.objects.ResetButton;
+import game.minesweeper.game.objects.Menu;
+import game.minesweeper.render.DrawableElement;
 import game.minesweeper.render.Shader;
 import game.minesweeper.render.Texture;
 import game.minesweeper.render.VAO;
@@ -32,7 +33,7 @@ public class Game
 	/**
 	 * Game properties
 	 */
-	private static final int widthCell 	= 30;
+	private static final int widthCell 	= 20;
 	private static final int heightCell = 20;
 	private static final int sizeCell 	= 30;
 	
@@ -47,9 +48,9 @@ public class Game
 	private static CellTable table;
 	
 	/**
-	 * Reset button
+	 * Game menu
 	 */
-	private static ResetButton resetButton;
+	private static Menu menu;
 	
 	/**
 	 * Method to initialize all that is needed for the cell table
@@ -98,12 +99,19 @@ public class Game
 		//Create the VAO for the menu
 		VAO menuVAO = new VAO(menuShader, menuTexture);
 		
-		//Create the reset button
-		resetButton = new ResetButton(window.getWidth() / 2 - sizeCell, sizeCell / 2, 2 * sizeCell, 2 * sizeCell);
+		//Create the menu
+		menu = new Menu(0, 0, window.getWidth(), 3 * sizeCell, sizeCell);
 		
-		//Add the reset button to the VAO
-		menuVAO.addElement(resetButton);
+		//Take all the drawable elements
+		DrawableElement array[] = menu.getDrawableElements();
 		
+		//Forall the elements i add them
+		for(int i = 0; i < array.length; i++)
+		{
+			//Add the reset button to the VAO
+			menuVAO.addElement(array[i]);
+		}
+			
 		//Add the attributes
 		menuVAO.addAttribute(2);
 		menuVAO.addAttribute(2);
@@ -161,7 +169,7 @@ public class Game
 	 * Game loop
 	 */
 	private static void run()
-	{		
+	{
 		//While the game is running
 		while(window.isOpen())
 		{	
@@ -170,11 +178,15 @@ public class Game
 			
 			//Call the handleMouseEvent functions
 			table.handleMouseEvent(event);
-			resetButton.handleMouseEvent(event);
+			menu.handleMouseEvent(event);
 			
-			//Check if the game needs to be reset
-			if(resetButton.shouldReset())
+			//I update the time passed counter
+			menu.tick();
+			
+			//Check if we should reset the game
+			if(menu.shouldReset())
 			{
+				menu.resetCounts();
 				table.resetTable();
 			}
 			

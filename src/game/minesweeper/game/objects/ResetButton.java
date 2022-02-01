@@ -37,19 +37,13 @@ public class ResetButton extends DrawableElement
 		 * Constructor
 		 * @param args The texture mapping
 		 */
-		private ResetButtonState(float... args)
-		{
-			textureMapping = args.clone();
-		}
+		private ResetButtonState(float... args) { textureMapping = args.clone(); }
 		
 		/**
 		 * Texture mapping getter
 		 * @return texture map
 		 */
-		public float[] getTextureMapping()
-		{
-			return textureMapping.clone();
-		}
+		public float[] getTextureMapping() { return textureMapping.clone(); }
 	}
 	
 	/**
