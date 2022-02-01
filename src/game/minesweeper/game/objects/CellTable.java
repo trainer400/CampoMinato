@@ -1,4 +1,4 @@
-package game.minesweeper.game;
+package game.minesweeper.game.objects;
 
 import game.minesweeper.window.listener.MouseEvent;
 import game.minesweeper.window.listener.MouseEvent.MouseEventType;
@@ -47,16 +47,6 @@ public class CellTable
 		//Instance the matrix (in case of negative or 0 width or height i use the value 10)
 		table = new Cell[width > 0 ? width : 10][height > 0 ? height : 10];
 		
-		//Init properly the table
-		initTable();
-	}
-	
-	/**
-	 * Method to initialize randomly the table
-	 * @param size The cells size
-	 */
-	private void initTable()
-	{
 		//Randomly assign the bombs
 		for(int i = 0; i < table.length; i++)
 		{
@@ -75,6 +65,16 @@ public class CellTable
 			}
 		}
 		
+		//Init properly the table
+		initTable();
+	}
+	
+	/**
+	 * Method to count the bombs and assign the numbers in the table
+	 * @param size The cells size
+	 */
+	private void initTable()
+	{	
 		//After all the bombs have been assigned i can calculate the numbers
 		for(int i = 0; i < table.length; i++)
 		{
@@ -114,13 +114,44 @@ public class CellTable
 	}
 	
 	/**
+	 * Method to reset the table with new configuration
+	 */
+	public void resetTable()
+	{
+		//I select randomly the bomb pattern
+		for(int i = 0; i < table.length; i++)
+		{
+			for(int j = 0; j < table[0].length; j++)
+			{
+				//Percentage of bombs
+				if(Math.random() > 0.9)
+				{
+					table[i][j].setRealState(CellStates.BOMB);
+					table[i][j].setState(CellStates.CELL_HIDDEN);
+				}
+				else 
+				{
+					//Otherwise it is a void cell for now
+					table[i][j].setRealState(CellStates.CELL_NONE);
+					table[i][j].setState(CellStates.CELL_HIDDEN);
+				}
+			}
+		}
+		
+		//After i assign the bombs i can re-init the table
+		initTable();
+	}
+	
+	/**
 	 * It handles an event (after checking that it differs from null and is a left click).
 	 * @param event Mouse event that determines what cell has been clicked
 	 */
 	public void handleMouseEvent(MouseEvent event)
 	{
-		//If the event is null
-		if(event == null) { return; }
+		//If the event is null or if the event is different from the clicks
+		if(event == null || (event.getEventType() != MouseEventType.RIGHT_CLICK &&
+							 event.getEventType() != MouseEventType.LEFT_CLICK  &&
+							 event.getEventType() != MouseEventType.CENTER_CLICK)) { return; }
 		
 		//Check if the event is about one of the cells
 		for(int i = 0; i < table.length; i++)
@@ -202,10 +233,11 @@ public class CellTable
 						//If i discover a bomb
 						if(table[i][j].getRealState() == CellStates.BOMB)
 						{
-							//TODO Game ends
-							
 							//Set the state to red bomb
 							table[i][j].setState(CellStates.BOMB_RED);
+							
+							//TODO Game ends
+							
 						}
 						else
 						{

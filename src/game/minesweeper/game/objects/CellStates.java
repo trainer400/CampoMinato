@@ -1,4 +1,4 @@
-package game.minesweeper.game;
+package game.minesweeper.game.objects;
 
 /**
  * Button state enumeration with texture atlas coordinates

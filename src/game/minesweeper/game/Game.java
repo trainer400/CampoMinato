@@ -14,10 +14,14 @@ import javax.swing.JOptionPane;
 
 import org.lwjgl.opengl.GL;
 
+import game.minesweeper.game.objects.Cell;
+import game.minesweeper.game.objects.CellTable;
+import game.minesweeper.game.objects.ResetButton;
 import game.minesweeper.render.Shader;
 import game.minesweeper.render.Texture;
 import game.minesweeper.render.VAO;
 import game.minesweeper.window.Window;
+import game.minesweeper.window.listener.MouseEvent;
 
 /**
  * This is the main class that implements all the game rules
@@ -28,7 +32,7 @@ public class Game
 	/**
 	 * Game properties
 	 */
-	private static final int widthCell 	= 20;
+	private static final int widthCell 	= 30;
 	private static final int heightCell = 20;
 	private static final int sizeCell 	= 30;
 	
@@ -42,6 +46,10 @@ public class Game
 	 */
 	private static CellTable table;
 	
+	/**
+	 * Reset button
+	 */
+	private static ResetButton resetButton;
 	
 	/**
 	 * Method to initialize all that is needed for the cell table
@@ -56,7 +64,7 @@ public class Game
 		VAO cellVAO = new VAO(cellShader, cellTexture);
 		
 		//Create the cellTable
-		table = new CellTable(0, 0, widthCell, heightCell, sizeCell);
+		table = new CellTable(0, 3 * sizeCell, widthCell, heightCell, sizeCell);
 		
 		//Create a temporary copy of the table
 		Cell[][] temp = table.getTable();
@@ -79,6 +87,32 @@ public class Game
 	}
 	
 	/**
+	 * Method to initialize the menu space
+	 */
+	private static void initMenu()
+	{
+		//Create texture and shader for the menu
+		Shader menuShader = new Shader("Shaders/buttonVertex.glsl", "Shaders/buttonFragment.glsl", null);
+		Texture menuTexture = new Texture("Textures/ButtonTexture.png");
+		
+		//Create the VAO for the menu
+		VAO menuVAO = new VAO(menuShader, menuTexture);
+		
+		//Create the reset button
+		resetButton = new ResetButton(window.getWidth() / 2 - sizeCell, sizeCell / 2, 2 * sizeCell, 2 * sizeCell);
+		
+		//Add the reset button to the VAO
+		menuVAO.addElement(resetButton);
+		
+		//Add the attributes
+		menuVAO.addAttribute(2);
+		menuVAO.addAttribute(2);
+		
+		//At the end i add the vao to the window
+		window.addVAO(menuVAO);
+	}
+	
+	/**
 	 * Initializes all the class objects and sets them
 	 */
 	public static void start()
@@ -91,13 +125,16 @@ public class Game
 		}
 		
 		//Create the window object
-		window = new Window("Mine Sweeper", widthCell * sizeCell, heightCell * sizeCell, false);
+		window = new Window("Mine Sweeper", widthCell * sizeCell, heightCell * sizeCell + 3 * sizeCell, false);
 		
 		//Create all OpenGL bindings
 		GL.createCapabilities();
 		
 		//Init the cells
 		initCells();
+		
+		//Init the top menu
+		initMenu();
 		
 		//Visualize the window
 		window.showWindow();
@@ -128,8 +165,18 @@ public class Game
 		//While the game is running
 		while(window.isOpen())
 		{	
+			//Take the event
+			MouseEvent event = window.getLastMouseEvent();
+			
 			//Call the handleMouseEvent functions
-			table.handleMouseEvent(window.getLastMouseEvent());
+			table.handleMouseEvent(event);
+			resetButton.handleMouseEvent(event);
+			
+			//Check if the game needs to be reset
+			if(resetButton.shouldReset())
+			{
+				table.resetTable();
+			}
 			
 			//Draw the VAOs
 			window.drawVAO();

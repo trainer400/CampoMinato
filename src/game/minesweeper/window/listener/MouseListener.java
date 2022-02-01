@@ -1,6 +1,7 @@
 package game.minesweeper.window.listener;
 
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 
@@ -43,6 +44,13 @@ public class MouseListener extends GLFWMouseButtonCallback
 											positionListener.getPosY(),
 											MouseEventType.values()[button < 3 ? button : 3]);
 		}
+		else if(action == GLFW_RELEASE)
+		{
+			//In case of a release i select the correspondent release
+			lastMouseEvent = new MouseEvent(positionListener.getPosX(),
+											positionListener.getPosY(),
+											MouseEventType.values()[button < 3? button + 4 : 7]);
+		}
 	}
 	
 	/**
@@ -50,8 +58,13 @@ public class MouseListener extends GLFWMouseButtonCallback
 	 */
 	public MouseEvent getLastMouseEvent() 
 	{
-		//Check if there is something to return
-		if(lastMouseEvent == null) { return null; }
+		//Check if there is something to return. In case there isn't i return the simple mouse position movement
+		if(lastMouseEvent == null) 
+		{
+			return new MouseEvent(positionListener.getPosX(),
+								  positionListener.getPosY(),
+								  MouseEventType.MOVE); 
+		}
 		
 		//Create a temporary variable where i store the details
 		MouseEvent temp = new MouseEvent(lastMouseEvent.getPosX(),

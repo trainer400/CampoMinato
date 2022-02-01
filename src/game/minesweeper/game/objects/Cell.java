@@ -1,4 +1,4 @@
-package game.minesweeper.game;
+package game.minesweeper.game.objects;
 
 import game.minesweeper.render.DrawableElement;
 
