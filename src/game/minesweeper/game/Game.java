@@ -17,6 +17,7 @@ import org.lwjgl.opengl.GL;
 import game.minesweeper.game.objects.Cell;
 import game.minesweeper.game.objects.CellTable;
 import game.minesweeper.game.objects.Menu;
+import game.minesweeper.game.objects.CellTable.GameState;
 import game.minesweeper.render.DrawableElement;
 import game.minesweeper.render.Shader;
 import game.minesweeper.render.Texture;
@@ -33,9 +34,10 @@ public class Game
 	/**
 	 * Game properties
 	 */
-	private static final int widthCell 	= 20;
-	private static final int heightCell = 20;
-	private static final int sizeCell 	= 30;
+	private static final int widthCell 		= 20;
+	private static final int heightCell 	= 20;
+	private static final int sizeCell 		= 40;
+	private static final float difficulty 	= 0.85f;
 	
 	/**
 	 * Main window
@@ -65,7 +67,7 @@ public class Game
 		VAO cellVAO = new VAO(cellShader, cellTexture);
 		
 		//Create the cellTable
-		table = new CellTable(0, 3 * sizeCell, widthCell, heightCell, sizeCell);
+		table = new CellTable(0, 3 * sizeCell, widthCell, heightCell, sizeCell, difficulty);
 		
 		//Create a temporary copy of the table
 		Cell[][] temp = table.getTable();
@@ -148,7 +150,7 @@ public class Game
 		window.showWindow();
 		
 		//Set the clear color to black
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClearColor(0.617f, 0.617f, 0.617f, 1.0f);
 		//Enable the alfa value in color settings
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
@@ -180,8 +182,15 @@ public class Game
 			table.handleMouseEvent(event);
 			menu.handleMouseEvent(event);
 			
-			//I update the time passed counter
-			menu.tick();
+			//If the game state is running
+			if(table.getGameState() != GameState.GAME_STOP)
+			{
+				//I update the time passed counter
+				menu.tick();
+			}
+			
+			//I update the number of minest counter
+			menu.showNumber(table.getBombsNumber() - table.getFlagsNumber());
 			
 			//Check if we should reset the game
 			if(menu.shouldReset())

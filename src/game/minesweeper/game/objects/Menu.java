@@ -78,7 +78,7 @@ public class Menu
 	}
 	
 	/**
-	 * Method to show a number with the mine dissplay
+	 * Method to show a number with the mine display
 	 * @param number The number to be shown
 	 */
 	public void showNumber(int number)

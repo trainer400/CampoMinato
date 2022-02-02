@@ -1,5 +1,7 @@
 package game.minesweeper.game.objects;
 
+import javax.swing.JOptionPane;
+
 import game.minesweeper.window.listener.MouseEvent;
 import game.minesweeper.window.listener.MouseEvent.MouseEventType;
 
@@ -10,6 +12,15 @@ import game.minesweeper.window.listener.MouseEvent.MouseEventType;
 public class CellTable 
 {
 	/**
+	 * Enumerates the different game states
+	 * @author Matteo Pignataro
+	 */
+	public static enum GameState
+	{
+		GAME_RUN, GAME_FAIL, GAME_SUCCESS, GAME_STOP;
+	}
+	
+	/**
 	 * X position
 	 */
 	private int x;
@@ -18,6 +29,31 @@ public class CellTable
 	 * Y position
 	 */
 	private int y;
+	
+	/**
+	 * Game state
+	 */
+	private GameState state;
+	
+	/**
+	 * Game difficulty (probability that the single cell is not a mine)
+	 */
+	private final float difficulty;
+	
+	/**
+	 * Number of actual bombs
+	 */
+	private int bombNumber;
+	
+	/**
+	 * Number of actual discovered bombs
+	 */
+	private int bombDiscovered;
+	
+	/**
+	 * Number of placed flags
+	 */
+	private int flags;
 	
 	/**
 	 * Cell size
@@ -37,12 +73,21 @@ public class CellTable
 	 * @param height The height in cells
 	 * @param size The size in pixel of every single cell
 	 */
-	public CellTable(int x, int y, int width, int height, int size)
+	public CellTable(int x, int y, int width, int height, int size, float difficulty)
 	{
 		//Assign all the variables
 		this.x = x;
 		this.y = y;
-		this.cellSize = size;
+		this.cellSize 	= size;
+		this.difficulty = difficulty > 0 && difficulty < 1 ? difficulty : 0.8f;
+		
+		//Init all the counters to 0
+		bombNumber		= 0;
+		bombDiscovered 	= 0;
+		flags 			= 0;
+		
+		//Set the game status to run
+		state = GameState.GAME_RUN;
 		
 		//Instance the matrix (in case of negative or 0 width or height i use the value 10)
 		table = new Cell[width > 0 ? width : 10][height > 0 ? height : 10];
@@ -53,9 +98,11 @@ public class CellTable
 			for(int j = 0; j < table[0].length; j++)
 			{
 				//Percentage of bombs
-				if(Math.random() > 0.9)
+				if(Math.random() > this.difficulty)
 				{
 					table[i][j] = new Cell(x + i * cellSize, y + j * cellSize, cellSize, cellSize, CellState.BOMB);
+					//Increment the bombNumber
+					bombNumber++;
 				}
 				else 
 				{
@@ -118,16 +165,26 @@ public class CellTable
 	 */
 	public void resetTable()
 	{
+		//Reset all the states
+		bombNumber		= 0;
+		bombDiscovered 	= 0;
+		flags 			= 0;
+		
+		//Set the game status to run
+		state = GameState.GAME_RUN;
+		
 		//I select randomly the bomb pattern
 		for(int i = 0; i < table.length; i++)
 		{
 			for(int j = 0; j < table[0].length; j++)
 			{
 				//Percentage of bombs
-				if(Math.random() > 0.9)
+				if(Math.random() > difficulty)
 				{
 					table[i][j].setRealState(CellState.BOMB);
 					table[i][j].setState(CellState.CELL_HIDDEN);
+					//I count the bomb
+					bombNumber++;
 				}
 				else 
 				{
@@ -148,6 +205,45 @@ public class CellTable
 	 */
 	public void handleMouseEvent(MouseEvent event)
 	{
+		//If the game is in stop mode i do nothing
+		if(state == GameState.GAME_STOP) { return; }
+		
+		//If the game is in the success mode i check if all the cells are not hidden
+		if(state == GameState.GAME_SUCCESS)
+		{
+			//Set the flag to true
+			boolean win = true;
+			
+			for(int i = 0; i < table.length; i++)
+			{
+				for(int j = 0; j < table[0].length; j++)
+				{
+					//If i find an hidden cell i cannot say that the player won
+					if(table[i][j].getState() == CellState.CELL_HIDDEN)
+					{
+						win = false;
+						break;
+					}
+				}
+			}
+			
+			//If no hidden cells are found i message the player that he won
+			if(win)
+			{
+				JOptionPane.showMessageDialog(null, "You won the game!", "You won!", JOptionPane.INFORMATION_MESSAGE);
+				//Set the game to stop
+				state = GameState.GAME_STOP;
+			}
+		}
+		
+		//If the state is fail i communicate the result and stop the game
+		if(state == GameState.GAME_FAIL)
+		{
+			JOptionPane.showMessageDialog(null, "You lost the game..", "You lost", JOptionPane.ERROR_MESSAGE);
+			//Set the state to stop
+			state = GameState.GAME_STOP;
+		}
+		
 		//If the event is null or if the event is different from the clicks
 		if(event == null || (event.getEventType() != MouseEventType.RIGHT_CLICK &&
 							 event.getEventType() != MouseEventType.LEFT_CLICK  &&
@@ -170,11 +266,31 @@ public class CellTable
 						{
 							//If it is a flag i remove it
 							table[i][j].setState(CellState.CELL_HIDDEN);
+							//Decrement the flags counter
+							flags--;
+							//Decrement the discovered bombs if it is a bomb
+							bombDiscovered -= table[i][j].getRealState() == CellState.BOMB ? 1 : 0;
+							
+							//If the state was on success and i left behind a bomb i put it on run
+							if(bombDiscovered < bombNumber)
+							{
+								state = GameState.GAME_RUN;
+							}
 						}
 						else
 						{
 							//I put a flag
 							table[i][j].setState(CellState.FLAG);
+							//Increment the flags counter
+							flags++;
+							//If it is a bomb i increment also the discovered counter
+							bombDiscovered += table[i][j].getRealState() == CellState.BOMB ? 1 : 0;
+							
+							//If the discovered bombs are the same number as the bombs i put the game state in success
+							if(bombDiscovered == bombNumber)
+							{
+								state = GameState.GAME_SUCCESS;
+							}
 						}
 						//Then i terminate
 						return;
@@ -236,8 +352,8 @@ public class CellTable
 							//Set the state to red bomb
 							table[i][j].setState(CellState.BOMB_RED);
 							
-							//TODO Game ends
-							
+							//Set the game state to fail
+							state = GameState.GAME_FAIL;
 						}
 						else
 						{
@@ -345,4 +461,7 @@ public class CellTable
 	//Simple getters
 	public int getPosX() { return x; }
 	public int getPosY() { return y; }
+	public GameState getGameState() { return state; }
+	public int getBombsNumber() { return bombNumber; }
+	public int getFlagsNumber() { return flags; }
 }
