@@ -19,6 +19,7 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
+import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -196,8 +197,10 @@ public class VAO
 			{
 				//Create the buffers
 				bufferFloat = BufferUtils.createFloatBuffer(elements.get(i).getVerticesSize())
-										 .put(elements.get(i).getVertices())
-										 .flip();
+										 .put(elements.get(i).getVertices());
+				
+				//Cast the buffer to avoid compatibility errors
+				((Buffer) bufferFloat).flip();
 				
 				bufferInt = BufferUtils.createIntBuffer(elements.get(i).getElementsSize());
 				
@@ -208,7 +211,7 @@ public class VAO
 				}
 				
 				//Flip the element buffer
-				bufferInt.flip();
+				((Buffer) bufferInt).flip();
 				
 				//Bind the VBO
 				glBindBuffer(GL_ARRAY_BUFFER, vboID);

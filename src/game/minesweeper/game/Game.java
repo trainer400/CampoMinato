@@ -36,7 +36,7 @@ public class Game
 	 */
 	private static final int widthCell 		= 20;
 	private static final int heightCell 	= 20;
-	private static final int sizeCell 		= 40;
+	private static final int sizeCell 		= 35;
 	private static final float difficulty 	= 0.85f;
 	
 	/**
