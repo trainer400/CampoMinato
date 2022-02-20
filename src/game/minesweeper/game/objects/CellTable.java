@@ -158,6 +158,20 @@ public class CellTable
 				}
 			}
 		}
+		
+		//Automatic first move to avoid bombs
+		for(int i = table.length / 3; i < table.length; i++)
+		{
+			for(int j = 0; j < table[0].length; j++)
+			{
+				if(table[i][j].getRealState() == CellState.CELL_NONE)
+				{
+					//I found the cell
+					handleMouseEvent(new MouseEvent(cellSize * i + cellSize / 2, cellSize * j + 3 * cellSize + cellSize / 2, MouseEventType.LEFT_CLICK));
+					return;
+				}
+			}
+		}
 	}
 	
 	/**
@@ -239,7 +253,7 @@ public class CellTable
 		//If the state is fail i communicate the result and stop the game
 		if(state == GameState.GAME_FAIL)
 		{
-			JOptionPane.showMessageDialog(null, "You lost the game..", "You lost", JOptionPane.ERROR_MESSAGE);
+			//JOptionPane.showMessageDialog(null, "You lost the game..", "You lost", JOptionPane.ERROR_MESSAGE);
 			//Set the state to stop
 			state = GameState.GAME_STOP;
 		}

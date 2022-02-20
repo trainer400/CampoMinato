@@ -10,6 +10,8 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glEnable;
 
+import java.awt.Toolkit;
+
 import javax.swing.JOptionPane;
 
 import org.lwjgl.opengl.GL;
@@ -36,8 +38,13 @@ public class Game
 	 */
 	private static final int widthCell 		= 20;
 	private static final int heightCell 	= 20;
-	private static final int sizeCell 		= 35;
+	private static int sizeCell 			= 30;
 	private static final float difficulty 	= 0.85f;
+	
+	private static final int screenWidthReference 	= 1920;
+	private static final int screenHeightReference 	= 1080;
+	
+	private static float scaleFactor;
 	
 	/**
 	 * Main window
@@ -133,6 +140,15 @@ public class Game
 			JOptionPane.showMessageDialog(null, "Error initializing GLFW!", "OpenGL error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+		//Take the screen size to scale the components
+		int width 	= (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+		int height 	= (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+		
+		//Calculate the scaling factor
+		scaleFactor = (float)(width * height) / (float)(screenWidthReference * screenHeightReference);
+		
+		//Scale the cellsize
+		sizeCell = (int)(sizeCell * scaleFactor);
 		
 		//Create the window object
 		window = new Window("Mine Sweeper", widthCell * sizeCell, heightCell * sizeCell + 3 * sizeCell, false);
