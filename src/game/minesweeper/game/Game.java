@@ -13,8 +13,10 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import java.awt.Toolkit;
 
 import javax.swing.JOptionPane;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.lwjgl.opengl.GL;
+import org.w3c.dom.Document;
 
 import game.minesweeper.game.objects.Cell;
 import game.minesweeper.game.objects.CellTable;
@@ -36,10 +38,10 @@ public class Game
 	/**
 	 * Game properties
 	 */
-	private static final int widthCell 		= 20;
-	private static final int heightCell 	= 20;
-	private static int sizeCell 			= 30;
-	private static final float difficulty 	= 0.85f;
+	private static int widthCell;
+	private static int heightCell;
+	private static int sizeCell;
+	private static float difficulty;
 	
 	private static final int screenWidthReference 	= 1920;
 	private static final int screenHeightReference 	= 1080;
@@ -129,6 +131,37 @@ public class Game
 		window.addVAO(menuVAO);
 	}
 	
+	private static void parseConfig()
+	{
+		try 
+		{
+			//Take and parse the document
+			Document configDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse("config.xml");
+			int width 		= Integer.parseInt(configDocument.getElementsByTagName("width").item(0).getTextContent());
+			int height 		= Integer.parseInt(configDocument.getElementsByTagName("height").item(0).getTextContent());
+			int cellSize 	= Integer.parseInt(configDocument.getElementsByTagName("cellSize").item(0).getTextContent());
+			int diff		= Integer.parseInt(configDocument.getElementsByTagName("difficulty").item(0).getTextContent());
+			
+			//Control the parsed arguments
+			width 		= width > 0 ? width : 20;
+			height		= height > 0 ? height : 20;
+			cellSize	= cellSize > 0 ? cellSize : 30;
+			diff	 	= diff > 0 && diff < 100 ? diff : 15;
+			
+			//Assign all the data
+			widthCell 	= width;
+			heightCell 	= height;
+			sizeCell	= cellSize;
+			difficulty 	= 1 - diff / 100.0f;
+			
+		} catch (Exception e) 
+		{
+			// Failed parsing i throw a runtime error
+			JOptionPane.showMessageDialog(null, "Error parsing the config.xml document", "Document parsing error", JOptionPane.ERROR_MESSAGE);
+			throw new RuntimeException("Failed parsing config.xml file [Game]");
+		}
+	}
+	
 	/**
 	 * Initializes all the class objects and sets them
 	 */
@@ -149,6 +182,9 @@ public class Game
 		
 		//Scale the cellsize
 		sizeCell = (int)(sizeCell * scaleFactor);
+		
+		//Parse the config document
+		parseConfig();
 		
 		//Create the window object
 		window = new Window("Mine Sweeper", widthCell * sizeCell, heightCell * sizeCell + 3 * sizeCell, false);
